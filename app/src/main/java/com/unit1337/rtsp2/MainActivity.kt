@@ -45,8 +45,9 @@ class MainActivity : AppCompatActivity() {
             setParameters(buildUponParameters()
 //                .setPreferredVideoMimeType(MimeTypes.VIDEO_H264)
                 .setPreferredVideoMimeType(MimeTypes.VIDEO_H265)
+                .setForceUseRtpTcp(true)
                 .setPreferredAudioMimeTypes(MimeTypes.AUDIO_AAC, MimeTypes.AUDIO_MPEG)
-                .setDisabledTrackTypes(setOf(C.TRACK_TYPE_AUDIO))
+                // .setDisabledTrackTypes(setOf(C.TRACK_TYPE_AUDIO))
             )
         }
 

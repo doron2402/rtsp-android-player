@@ -6,6 +6,7 @@ package com.unit1337.rtsp2
 //  "rtsp://51.17.227.45:5555/av0_0"
 //  "rtsp://51.17.227.45:5555/av0_1"
 //  "rtsp://fake.kerberos.io/stream"
+
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
@@ -15,13 +16,13 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MimeTypes
 import androidx.media3.common.PlaybackException
-import androidx.media3.common.util.UnstableApi
+import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
 import androidx.media3.exoplayer.rtsp.RtspMediaSource
 import androidx.media3.ui.PlayerView
 import androidx.media3.common.C
 import androidx.media3.common.Player
-import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.common.util.UnstableApi
 
 class MainActivity : AppCompatActivity() {
     private lateinit var rtspUrlEditText: EditText
@@ -41,8 +42,9 @@ class MainActivity : AppCompatActivity() {
         // Create a DefaultTrackSelector with preferred video codecs and disabled audio
         val trackSelector = DefaultTrackSelector(this).apply {
             setParameters(buildUponParameters()
-                .setPreferredVideoMimeType(MimeTypes.VIDEO_H264)
-//                .setPreferredVideoMimeType(MimeTypes.VIDEO_H265)
+//                .setPreferredVideoMimeType(MimeTypes.VIDEO_H264)
+                .setPreferredVideoMimeType(MimeTypes.VIDEO_H265)
+//                .setPreferredAudioMimeTypes(MimeTypes.AUDIO_AAC, MimeTypes.AUDIO_MPEG)
                 .setDisabledTrackTypes(setOf(C.TRACK_TYPE_AUDIO))
             )
         }
@@ -56,7 +58,8 @@ class MainActivity : AppCompatActivity() {
         connectButton.setOnClickListener {
             var rtspUrl = rtspUrlEditText.text.toString()
             if (rtspUrl.isEmpty()) {
-                rtspUrl = "rtsp://51.17.227.45:5555/av0_0"
+//                rtspUrl = "rtsp://51.17.227.45:5555/av0_0"
+                rtspUrl = "rtsp://51.17.227.45:5555/av0_1"
             }
             playRtspStream(rtspUrl)
         }
@@ -66,18 +69,32 @@ class MainActivity : AppCompatActivity() {
             override fun onPlayerError(error: PlaybackException) {
                 Log.e("ExoPlayer", "Player error: ${error.message}")
             }
+
+            override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
+                when (playbackState) {
+                    Player.STATE_BUFFERING -> Log.d("ExoPlayer", "Buffering...")
+                    Player.STATE_READY -> Log.d("ExoPlayer", "Ready to play")
+                    Player.STATE_ENDED -> Log.d("ExoPlayer", "Playback ended")
+                    Player.STATE_IDLE -> Log.d("ExoPlayer", "Player idle")
+                }
+            }
         })
     }
 
     @OptIn(UnstableApi::class)
     private fun playRtspStream(rtspUrl: String) {
-        val mediaItem = MediaItem.fromUri(rtspUrl)
+        val mediaItem = MediaItem.Builder()
+            .setUri(rtspUrl)
+            .setMimeType(MimeTypes.APPLICATION_RTSP)
+            .build()
         val factory = RtspMediaSource.Factory()
         val mediaSource = factory.createMediaSource(mediaItem)
 
-        exoPlayer?.setMediaSource(mediaSource)
-        exoPlayer?.prepare()
-        exoPlayer?.play()
+        exoPlayer?.apply {
+            setMediaSource(mediaSource)
+            prepare()
+            play()
+        }
     }
 
     override fun onStop() {
@@ -85,8 +102,4 @@ class MainActivity : AppCompatActivity() {
         exoPlayer?.release()
         exoPlayer = null
     }
-}
-
-private fun Player.addListener(any: Any) {
-
 }

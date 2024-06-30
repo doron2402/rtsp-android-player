@@ -21,6 +21,7 @@ import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
 import androidx.media3.exoplayer.rtsp.RtspMediaSource
 import androidx.media3.ui.PlayerView
 import androidx.media3.common.C
+import androidx.media3.common.MediaMetadata
 import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
 
@@ -44,7 +45,7 @@ class MainActivity : AppCompatActivity() {
             setParameters(buildUponParameters()
 //                .setPreferredVideoMimeType(MimeTypes.VIDEO_H264)
                 .setPreferredVideoMimeType(MimeTypes.VIDEO_H265)
-//                .setPreferredAudioMimeTypes(MimeTypes.AUDIO_AAC, MimeTypes.AUDIO_MPEG)
+                .setPreferredAudioMimeTypes(MimeTypes.AUDIO_AAC, MimeTypes.AUDIO_MPEG)
                 .setDisabledTrackTypes(setOf(C.TRACK_TYPE_AUDIO))
             )
         }
@@ -77,6 +78,11 @@ class MainActivity : AppCompatActivity() {
                     Player.STATE_ENDED -> Log.d("ExoPlayer", "Playback ended")
                     Player.STATE_IDLE -> Log.d("ExoPlayer", "Player idle")
                 }
+            }
+
+            override fun onPlaylistMetadataChanged(mediaMetadata: MediaMetadata) {
+                super.onPlaylistMetadataChanged(mediaMetadata)
+                Log.w("State Change", "media meta data changed" )
             }
         })
     }

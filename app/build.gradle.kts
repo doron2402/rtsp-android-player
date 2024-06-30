@@ -3,6 +3,8 @@ plugins {
     alias(libs.plugins.jetbrains.kotlin.android)
 }
 
+val exoPlayerVersion = "1.4.0-beta01"
+
 android {
     namespace = "com.unit1337.rtsp2"
     compileSdk = 34
@@ -47,9 +49,10 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
 
     // player
-    implementation("androidx.media3:media3-ui:1.3.1")
-    implementation("androidx.media3:media3-exoplayer:1.3.1")
     implementation("com.google.android.material:material:1.9.0")
-    implementation("androidx.media3:media3-exoplayer-rtsp:1.3.1")
+
+    implementation("androidx.media3:media3-ui:$exoPlayerVersion")
+    implementation("androidx.media3:media3-exoplayer:$exoPlayerVersion")
+    implementation("androidx.media3:media3-exoplayer-rtsp:$exoPlayerVersion")
 
 }
